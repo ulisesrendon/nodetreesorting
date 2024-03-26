@@ -1,0 +1,28 @@
+*, *::after, *::before{
+    box-sizing: border-box;
+}
+body.dark{
+    background-color: #333;
+}
+.container{
+    margin: 0 auto;
+    max-width: 98%;
+    width: 960px;
+}
+.dark .inputfield-block > *{
+    width: 100%;
+    background-color: transparent;
+    min-height: 200px;
+}
+.dark h2{
+    color: #f0f0f0;
+}
+#result{
+    background-color: #ccc;
+    border-color: #ccc;
+    min-height: 100px;
+}
+[contenteditable]{
+    color: #f0f0f0;
+    border: 1px solid #ccc
+}

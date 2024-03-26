@@ -1,0 +1,39 @@
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
+
+body.dark {
+    background-color: #333;
+}
+
+body.dark h2 {
+    color: #f0f0f0;
+    text-align: center;
+}
+
+.container {
+    margin: 0 auto;
+    max-width: 98%;
+    width: 960px;
+}
+
+.drag-list {
+    list-style: none;
+    padding: 0;
+}
+
+.drag-item,
+.list-group-item {
+    background-color: #cc56ff;
+    padding: 10px;
+    margin-bottom: 5px;
+    cursor: move;
+    border: 1px solid #333;
+}
+
+.nested-sortable,
+.nested{
+    margin-top: 5px;
+}
