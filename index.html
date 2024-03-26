@@ -1,71 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
+
 <body class="dark">
     <div class="container">
         <h2>Ordering entities</h2>
-        <div id="entities-list" class="list-group nested-sortable">
-            <div id="entity-main" class="list-group-item nested">
-                <div class="list-group nested-sortable"></div>
-            </div>
-            <!-- <div class="list-group-item nested">Item A
-                <div class="list-group nested-sortable"></div>
-            </div>
-            <div class="list-group-item nested">Item B
-                <div class="list-group nested-sortable"></div>
-            </div>
-            <div class="list-group-item nested">Item C
-                <div class="list-group nested-sortable"></div>
-            </div> -->
+        <div id="entityMain" class="list-group-item nested">
+            <div class="list-group nested-sortable"></div>
         </div>
-        <button type="button">Guardar</button>
+        <button type="button" id="entityOrderSave">Guardar</button>
     </div>
     <script>
-    const data = [
-        {
-            "id": "2",
-            "title": "Image container",
-            "type": "container",
-            "parent": "0"
-        },
-        {
-            "id": "4",
-            "title": "Image #1",
-            "type": "image",
-            "parent": "2"
-        },
-        {
-            "id": "5",
-            "title": "Image #2",
-            "type": "image",
-            "parent": "2"
-        },
-        {
-            "id": "20",
-            "title": "Option list",
-            "type": "list",
-            "parent": "0"
-        },
-        {
-            "id": "22",
-            "title": "Answer #1",
-            "type": "checkbox",
-            "parent": "20"
-        },
-        {
-            "id": "23",
-            "title": "Answer #2",
-            "type": "checkbox",
-            "parent": "20"
-        },
-    ];
+        const contentFields = [
+            {
+                "id": "2",
+                "title": "Image container",
+                "type": "container",
+                "parent": "0"
+            },
+            {
+                "id": "4",
+                "title": "Image #1",
+                "type": "image",
+                "parent": "2"
+            },
+            {
+                "id": "5",
+                "title": "Image #2",
+                "type": "image",
+                "parent": "2"
+            },
+            {
+                "id": "20",
+                "title": "Option list",
+                "type": "list",
+                "parent": "0"
+            },
+            {
+                "id": "22",
+                "title": "Answer #1",
+                "type": "checkbox",
+                "parent": "20"
+            },
+            {
+                "id": "23",
+                "title": "Answer #2",
+                "type": "checkbox",
+                "parent": "20"
+            },
+        ];
     </script>
     <script src="js/Sortable.min.js"></script>
     <script src="js/order.js"></script>
 </body>
+
 </html>
