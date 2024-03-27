@@ -10,16 +10,25 @@
 
 <body class="dark">
     <div class="container">
-        <h2>Schema update</h2>
-        <div id="treeBase" class="list-group-item nested">
-            <div class="list-group nested-sortable"></div>
+        <h2>Schema Editor</h2>
+        <div id="treeBase" class="list-group-item nested-sortable">
+            <!-- <div class="list-group nested-sortable"></div> -->
         </div>
-        <button type="button" id="shemaUpdateSave">Guardar</button>
+        <button type="button" id="schemaUpdateSave">Guardar</button>
 
-        <div class="container">
+        <div class="container optionlist-container">
             <div class="optionListContainer"></div>
             <button type="button" class="schemaCreateNode">Añadir campo</button>
         </div>
+        <form class="container">
+            <div>
+                <input type="text" name="node_id" id="node_id" value="0" readonly>
+            </div>
+            <div>
+                <input type="text" name="node_title" id="node_title" value="" readonly>
+            </div>
+            <button type="button" id="delete_node">Eliminar</button>
+        </form>
     </div>
     <script>
         const contentNodes = [

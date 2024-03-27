@@ -6,19 +6,33 @@ const getNodeData = function () {
     return nodeList;
 };
 
-const nodeItem = document.createElement('div');
-nodeItem.classList.add('list-group-item');
-nodeItem.classList.add('nested');
+const nodeItemBase = document.createElement('div');
+nodeItemBase.classList.add('list-group-item');
+nodeItemBase.classList.add('nested-sortable');
+nodeItemBase.classList.add('nested');
+const selectedNodeId = document.querySelector('#node_id');
+const selectedNodeTitle = document.querySelector('#node_title');
 const nodeRender = function (node) {
-    const newItem = nodeItem.cloneNode();
-    newItem.setAttribute('data-id', node.id)
-    newItem.setAttribute('data-title', node.title)
-    newItem.innerHTML = `id_${node.id} ${node.title}`;
+    const newItem = nodeItemBase.cloneNode();
+    newItem.setAttribute('data-id', node.id);
+    newItem.setAttribute('data-title', node.title);
+    newItem.classList.add('nodeitem');
+    newItem.innerHTML = `${node.title} (field_${node.id})`;
     new Sortable(newItem, {
         group: 'nested',
         animation: 150,
         fallbackOnBody: true,
-        swapThreshold: 0.65
+        swapThreshold: 0.65,
+        fallbackTolerance: '20px',
+        emptyInsertThreshold: 10,
+        sort: true,
+        swapThreshold: 1,
+        direction: 'vertical'
+    });
+    newItem.addEventListener('click', function(e){
+        e.stopPropagation()
+        selectedNodeId.value = node.id;
+        selectedNodeTitle.value = node.title;
     });
     return newItem;
 };
@@ -29,7 +43,12 @@ const treeBasePrepare = function(treeBase){
         group: 'nested',
         animation: 150,
         fallbackOnBody: true,
-        swapThreshold: 0.65
+        swapThreshold: 0.65,
+        fallbackTolerance: '20px',
+        emptyInsertThreshold: 10,
+        sort: true,
+        swapThreshold: 1,
+        direction: 'vertical'
     });
     return treeBase;
 };
@@ -37,11 +56,7 @@ const treeBasePrepare = function(treeBase){
 const treeNodeRender = function (nodeList, treeBase) {
     let nodeMap = [];
     for (let i = 0; i < nodeList.length; i++) {
-        nodeMap[nodeList[i].id] = {
-            "render": nodeRender(nodeList[i]),
-            "data": nodeList[i]
-        };
-        treeBase.appendChild(nodeMap[nodeList[i].id].render);
+        addTreeNode(treeBase, nodeMap, nodeList[i]);
     }
     for (id in nodeMap) {
         if (nodeMap[id].data.parent != 0) {
@@ -74,17 +89,15 @@ const shemaSave = function (nodeMap){
 };
 
 const prepareOptionList = function(nodeOptionList){
-    
-    nodeOptionList.unshift({
+    nodeOptionList[0] = {
         "id": "",
         "name": "",
         "title": "Seleccione una opción"
-    });
+    };
 
     const optionSelect = document.createElement("select");
     const optionItem = document.createElement("option");
-
-    for(let i = 0; i<nodeOptionList.length; i++){
+    for (i in nodeOptionList){
         const newItem = optionItem.cloneNode();
         newItem.innerHTML = nodeOptionList[i].title;
         newItem.setAttribute('value', nodeOptionList[i].id);
@@ -95,11 +108,24 @@ const prepareOptionList = function(nodeOptionList){
 };
 
 const presentOptionNodeList = function (nodeOptionList){
-    return nodeOptionList;
+    let nodeOptionMap = [];
+    for(let i = 0; i<nodeOptionList.length; i++){
+        nodeOptionMap[nodeOptionList[i].id] = nodeOptionList[i];
+    }
+
+    return nodeOptionMap;
 };
 
-const addTreeNode = function (treeBase, node){
+const addTreeNode = function (treeBase, nodeMap, nodeItem){
+    nodeMap[nodeItem.id] = {
+        "render": nodeRender(nodeItem),
+        "data": nodeItem
+    };
+    treeBase.appendChild(nodeMap[nodeItem.id].render);
+};
 
+const schemaUpdateAddNode = function(nodeData){
+    return Math.floor(Math.random() * 1000);
 };
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -110,19 +136,30 @@ document.addEventListener('DOMContentLoaded', function(){
     let nodeMap = treeNodeRender(getNodeData(), treeBase);
 
     // Set the save shema button function
-    const shemaUpdateSave = document.querySelector("#shemaUpdateSave");
-    shemaUpdateSave.addEventListener('click', function () {
+    const schemaUpdateSave = document.querySelector("#schemaUpdateSave");
+    schemaUpdateSave.addEventListener('click', function () {
         shemaSave(nodeMap);
     });
 
     // Render the available node option list
     const optionListContainer = document.querySelector(".optionListContainer");
-    const optionNodeList = presentOptionNodeList(nodeOptionList);
-    const optionListSelector = prepareOptionList(optionNodeList);
+    const optionNodeMap = presentOptionNodeList(nodeOptionList);
+    const optionListSelector = prepareOptionList(optionNodeMap);
     optionListContainer.appendChild(optionListSelector);
 
     const schemaCreateNode = document.querySelector(".schemaCreateNode");
     schemaCreateNode.addEventListener('click', function(){
-        alert(optionListSelector.value);
+        if (optionListSelector.value != 0 ){
+            const optionSelected = optionNodeMap[optionListSelector.value];
+
+            const newNodeId = schemaUpdateAddNode(optionSelected);
+
+            addTreeNode(treeBase, nodeMap, {
+                "id": newNodeId,
+                "title": optionSelected.title,
+                "type": optionSelected.name,
+                "parent": "0"
+            });
+        }
     });
 });

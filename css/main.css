@@ -19,21 +19,37 @@ body.dark h2 {
     width: 960px;
 }
 
-.drag-list {
-    list-style: none;
-    padding: 0;
-}
-
-.drag-item,
+/* .drag-item,
 .list-group-item {
     background-color: #cc56ff;
     padding: 10px;
     margin-bottom: 5px;
     cursor: move;
     border: 1px solid #333;
+} */
+.nodeitem, #treeBase{
+    background-color: #cc56ff;
+    padding: 10px;
+    margin-bottom: 0.8rem;
+    margin-top: 10px;
+    cursor: move;
+    border: 1px solid #333;
+    padding: .75rem 1.25rem;
 }
 
 .nested-sortable,
 .nested{
     margin-top: 5px;
+}
+
+.nodeitem-container{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+.optionlist-container{
+    display: flex;
+    flex-flow: row nowrap;
+    padding: 2rem 0;
 }
