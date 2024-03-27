@@ -1,20 +1,19 @@
-const mainItem = document.createElement('div');
-mainItem.classList.add('list-group-item');
-mainItem.classList.add('nested');
-
-const getFieldData = function () {
-    let fieldList = localStorage.getItem('fieldList') || contentFields;
-    if (typeof fieldList === 'string') {
-        fieldList = JSON.parse(fieldList);
+const getNodeData = function () {
+    let nodeList = localStorage.getItem('nodeList') || contentNodes;
+    if (typeof nodeList === 'string') {
+        nodeList = JSON.parse(nodeList);
     }
-    return fieldList;
+    return nodeList;
 };
 
-const fieldRender = function (field) {
-    const newItem = mainItem.cloneNode();
-    newItem.setAttribute('data-id', field.id)
-    newItem.setAttribute('data-title', field.title)
-    newItem.innerHTML = `id_${field.id} ${field.title}`;
+const nodeItem = document.createElement('div');
+nodeItem.classList.add('list-group-item');
+nodeItem.classList.add('nested');
+const nodeRender = function (node) {
+    const newItem = nodeItem.cloneNode();
+    newItem.setAttribute('data-id', node.id)
+    newItem.setAttribute('data-title', node.title)
+    newItem.innerHTML = `id_${node.id} ${node.title}`;
     new Sortable(newItem, {
         group: 'nested',
         animation: 150,
@@ -24,63 +23,106 @@ const fieldRender = function (field) {
     return newItem;
 };
 
-const treeBasePrepare = function(){
-    const entityMain = document.querySelector("#entityMain");
-    entityMain.setAttribute('data-id', 0);
-    new Sortable(entityMain, {
+const treeBasePrepare = function(treeBase){
+    treeBase.setAttribute('data-id', 0);
+    new Sortable(treeBase, {
         group: 'nested',
         animation: 150,
         fallbackOnBody: true,
         swapThreshold: 0.65
     });
-    return entityMain;
+    return treeBase;
 };
 
-const treeNodeRender = function (fieldList, treeBase) {
-    let entityMap = [];
-    for (let i = 0; i < fieldList.length; i++) {
-        entityMap[fieldList[i].id] = {
-            "render": fieldRender(fieldList[i]),
-            "data": fieldList[i]
+const treeNodeRender = function (nodeList, treeBase) {
+    let nodeMap = [];
+    for (let i = 0; i < nodeList.length; i++) {
+        nodeMap[nodeList[i].id] = {
+            "render": nodeRender(nodeList[i]),
+            "data": nodeList[i]
         };
-        treeBase.appendChild(entityMap[fieldList[i].id].render);
+        treeBase.appendChild(nodeMap[nodeList[i].id].render);
     }
-    for (id in entityMap) {
-        if (entityMap[id].data.parent != 0) {
-            entityMap[entityMap[id].data.parent].render.appendChild(entityMap[id].render);
+    for (id in nodeMap) {
+        if (nodeMap[id].data.parent != 0) {
+            nodeMap[nodeMap[id].data.parent].render.appendChild(nodeMap[id].render);
         }
     }
 
-    return entityMap;
+    return nodeMap;
 };
 
-const shemaSave = function (entityMap){
-    for (id in entityMap) {
-        entityMap[id].weight = Array.from(entityMap[id].render.parentNode.children).indexOf(entityMap[id].render);
+const shemaSave = function (nodeMap){
+    for (id in nodeMap) {
+        nodeMap[id].weight = Array.from(nodeMap[id].render.parentNode.children).indexOf(nodeMap[id].render);
     }
 
-    entityMap.sort(function (a, b) {
+    nodeMap.sort(function (a, b) {
         return a.weight - b.weight;
     });
 
-    let updatedFieldList = [];
-    for (id in entityMap) {
-        updatedFieldList.push({
-            "id": entityMap[id].data.id,
-            "title": entityMap[id].data.title,
-            "type": entityMap[id].data.type,
-            "parent": entityMap[id].render.parentNode.getAttribute('data-id')
+    let updatedNodeList = [];
+    for (id in nodeMap) {
+        updatedNodeList.push({
+            "id": nodeMap[id].data.id,
+            "title": nodeMap[id].data.title,
+            "type": nodeMap[id].data.type,
+            "parent": nodeMap[id].render.parentNode.getAttribute('data-id')
         });
     }
-    localStorage.setItem('fieldList', JSON.stringify(updatedFieldList));
+    localStorage.setItem('nodeList', JSON.stringify(updatedNodeList));
 };
 
-const shemaUpdateSave = function (entityMap){
-    document.querySelector("#shemaUpdateSave").addEventListener('click', function(){
-        shemaSave(entityMap);
-    })
+const prepareOptionList = function(nodeOptionList){
+    
+    nodeOptionList.unshift({
+        "id": "",
+        "name": "",
+        "title": "Seleccione una opción"
+    });
+
+    const optionSelect = document.createElement("select");
+    const optionItem = document.createElement("option");
+
+    for(let i = 0; i<nodeOptionList.length; i++){
+        const newItem = optionItem.cloneNode();
+        newItem.innerHTML = nodeOptionList[i].title;
+        newItem.setAttribute('value', nodeOptionList[i].id);
+        optionSelect.appendChild(newItem);
+    }
+
+    return optionSelect;
+};
+
+const presentOptionNodeList = function (nodeOptionList){
+    return nodeOptionList;
+};
+
+const addTreeNode = function (treeBase, node){
+
 };
 
 document.addEventListener('DOMContentLoaded', function(){
-    shemaUpdateSave(treeNodeRender(getFieldData(), treeBasePrepare()));
+    // Schema container must be sortable and must have data-id="0" as attribute
+    const treeBase = treeBasePrepare(document.querySelector("#treeBase"));
+
+    // Rendering the tree nodes and prepare a map that contains references to the nodes 
+    let nodeMap = treeNodeRender(getNodeData(), treeBase);
+
+    // Set the save shema button function
+    const shemaUpdateSave = document.querySelector("#shemaUpdateSave");
+    shemaUpdateSave.addEventListener('click', function () {
+        shemaSave(nodeMap);
+    });
+
+    // Render the available node option list
+    const optionListContainer = document.querySelector(".optionListContainer");
+    const optionNodeList = presentOptionNodeList(nodeOptionList);
+    const optionListSelector = prepareOptionList(optionNodeList);
+    optionListContainer.appendChild(optionListSelector);
+
+    const schemaCreateNode = document.querySelector(".schemaCreateNode");
+    schemaCreateNode.addEventListener('click', function(){
+        alert(optionListSelector.value);
+    });
 });

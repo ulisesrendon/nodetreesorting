@@ -11,20 +11,18 @@
 <body class="dark">
     <div class="container">
         <h2>Schema update</h2>
-        <div id="entityMain" class="list-group-item nested">
+        <div id="treeBase" class="list-group-item nested">
             <div class="list-group nested-sortable"></div>
         </div>
         <button type="button" id="shemaUpdateSave">Guardar</button>
 
         <div class="container">
-            <select>
-                <option>Seleccione opción</option>
-            </select>
-            <button type="button">Añadir campo</button>
+            <div class="optionListContainer"></div>
+            <button type="button" class="schemaCreateNode">Añadir campo</button>
         </div>
     </div>
     <script>
-        const contentFields = [
+        const contentNodes = [
             {
                 "id": "34",
                 "title": "Image list",
@@ -68,7 +66,7 @@
                 "parent": "20"
             },
         ];
-        const typeFields = [
+        const nodeOptionList = [
             {
                 "id": 11,
                 "name": "container",
