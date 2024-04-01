@@ -3,12 +3,20 @@
 *::before {
     box-sizing: border-box;
 }
+html, body{
+    font-size: 18px;
+}
 
 body.dark {
     background-color: #333;
+    color: #f0f0f0;
 }
 
 body.dark h2 {
+    color: #d0d0d0;
+}
+
+body.dark a {
     color: #f0f0f0;
     text-align: center;
 }
@@ -17,6 +25,14 @@ body.dark h2 {
     margin: 0 auto;
     max-width: 98%;
     width: 960px;
+}
+.container .container{
+    width: 100%;
+    max-width: 100%;
+}
+.pd-y-2{
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
 /* .drag-item,
@@ -52,4 +68,19 @@ body.dark h2 {
     display: flex;
     flex-flow: row nowrap;
     padding: 2rem 0;
+}
+.schemaList li {
+    display: flex;
+    justify-content: space-between;
+}
+.list-group-item {
+    color: #333;
+}
+.form-field{
+    padding: 1rem 0;
+}
+.form-field .form-field-block{
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
 }
