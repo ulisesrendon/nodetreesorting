@@ -59,7 +59,7 @@ const treeNodeRender = function (nodeList, treeBase) {
         addTreeNode(treeBase, nodeMap, nodeList[i]);
     }
     for (id in nodeMap) {
-        if (nodeMap[id].data.parent != 0) {
+        if (nodeMap[id].data.parent != 0 && nodeMap[nodeMap[id].data.parent]) {
             nodeMap[nodeMap[id].data.parent].render.appendChild(nodeMap[id].render);
         }
     }
@@ -67,7 +67,7 @@ const treeNodeRender = function (nodeList, treeBase) {
     return nodeMap;
 };
 
-const shemaSave = function (nodeMap){
+const schemaSave = function (nodeMap){
     for (id in nodeMap) {
         nodeMap[id].weight = Array.from(nodeMap[id].render.parentNode.children).indexOf(nodeMap[id].render);
     }
@@ -135,10 +135,10 @@ document.addEventListener('DOMContentLoaded', function(){
     // Rendering the tree nodes and prepare a map that contains references to the nodes 
     let nodeMap = treeNodeRender(getNodeData(), treeBase);
 
-    // Set the save shema button function
+    // Set the save schema button function
     const schemaUpdateSave = document.querySelector("#schemaUpdateSave");
     schemaUpdateSave.addEventListener('click', function () {
-        shemaSave(nodeMap);
+        schemaSave(nodeMap);
     });
 
     // Render the available node option list
@@ -151,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function(){
     schemaCreateNode.addEventListener('click', function(){
         if (optionListSelector.value != 0 ){
             const optionSelected = optionNodeMap[optionListSelector.value];
-
             const newNodeId = schemaUpdateAddNode(optionSelected);
 
             addTreeNode(treeBase, nodeMap, {
@@ -160,6 +159,16 @@ document.addEventListener('DOMContentLoaded', function(){
                 "type": optionSelected.name,
                 "parent": "0"
             });
+        }
+    });
+
+    const schemaDeleteNode = document.querySelector(".schemaDeleteNode");
+    schemaDeleteNode.addEventListener('click', function(){
+        const nodeToRemove = nodeMap[selectedNodeId.value] || null;
+        if (nodeToRemove){
+            nodeToRemove.render.remove();
+            delete nodeMap[selectedNodeId.value];
+            console.log(nodeToRemove);
         }
     });
 });
