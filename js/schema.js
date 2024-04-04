@@ -9,13 +9,18 @@ const getNodeOptionList = async function () {
     return data ?? [];
 };
 
+const getNodeDataById = async function (contentId) {
+    const response = await fetch(`http://api.localhost/v2/content/type/${contentId}`);
+    const { data } = await response.json();
+    const { fields } = data;
+    return fields ?? [];
+};
+
 const nodeItemBase = document.createElement('div');
 nodeItemBase.classList.add('list-group-item');
 nodeItemBase.classList.add('nested-sortable');
 nodeItemBase.classList.add('nested');
-const selectedNodeId = document.querySelector('#node_id');
-const selectedNodeTitle = document.querySelector('#node_title');
-const nodeRender = function (node) {
+const nodeRender = function (node, updateSeletedNodeState) {
     const newItem = nodeItemBase.cloneNode();
     newItem.setAttribute('data-id', node.id);
     newItem.setAttribute('data-title', node.title);
@@ -34,8 +39,7 @@ const nodeRender = function (node) {
     });
     newItem.addEventListener('click', function(e){
         e.stopPropagation()
-        selectedNodeId.value = node.id;
-        selectedNodeTitle.value = node.title;
+        updateSeletedNodeState(node);
     });
     return newItem;
 };
@@ -56,10 +60,10 @@ const treeBasePrepare = function(treeBase){
     return treeBase;
 };
 
-const treeNodeRender = function (nodeList, treeBase) {
+const treeNodeRender = function (nodeList, treeBase, updateSeletedNodeState) {
     let nodeMap = [];
     for (let i = 0; i < nodeList.length; i++) {
-        addTreeNode(treeBase, nodeMap, nodeList[i]);
+        addTreeNode(treeBase, nodeMap, nodeList[i], updateSeletedNodeState);
     }
     for (id in nodeMap) {
         if (nodeMap[id].data.parent != 0 && nodeMap[nodeMap[id].data.parent]) {
@@ -69,7 +73,6 @@ const treeNodeRender = function (nodeList, treeBase) {
 
     return nodeMap;
 };
-
 
 const prepareOptionList = function(nodeOptionList){
     nodeOptionList[0] = {
@@ -99,9 +102,9 @@ const presentOptionNodeList = function (nodeOptionList){
     return nodeOptionMap;
 };
 
-const addTreeNode = function (treeBase, nodeMap, nodeItem){
+const addTreeNode = function (treeBase, nodeMap, nodeItem, updateSeletedNodeState){
     nodeMap[nodeItem.id] = {
-        "render": nodeRender(nodeItem),
+        "render": nodeRender(nodeItem, updateSeletedNodeState),
         "data": nodeItem
     };
     treeBase.appendChild(nodeMap[nodeItem.id].render);
@@ -111,46 +114,10 @@ const schemaUpdateAddNode = function(nodeData){
     return Math.floor(Math.random() * 1000);
 };
 
-const schemaDeleteNode = function(nodeId){
+const schemaDeleteNode = function (nodeId, nodeMap){
     const nodeToRemove = nodeMap[nodeId] || null;
     if (nodeToRemove) {
         nodeToRemove.render.remove();
         delete nodeMap[nodeId];
     }
 };
-
-// map that contains references to the nodes 
-const nodeMap = []
-
-document.addEventListener('DOMContentLoaded', async function(){
-    // Schema container must be sortable and must have data-id="0" as attribute
-    const treeBase = treeBasePrepare(document.querySelector("#treeBase"));
-
-    // Set the schema deleting function
-    document.querySelector(".schemaDeleteNode").addEventListener('click', function () {
-        cschemaDeleteNode(selectedNodeId.value);        
-    });
-
-    // Render the available node option list
-    const optionListContainer = document.querySelector(".optionListContainer");
-    const optionNodeMap = presentOptionNodeList(getNodeOptionList());
-    const optionListSelector = prepareOptionList(optionNodeMap);
-    optionListContainer.appendChild(optionListSelector);
-
-    // Set the schema adding node function
-    const schemaCreateNode = document.querySelector(".schemaCreateNode");
-    schemaCreateNode.addEventListener('click', function () {
-        if (optionListSelector.value != 0) {
-            const optionSelected = optionNodeMap[optionListSelector.value];
-            const newNodeId = schemaUpdateAddNode(optionSelected);
-
-            addTreeNode(treeBase, nodeMap, {
-                "id": newNodeId,
-                "title": optionSelected.title,
-                "type": optionSelected.name,
-                "parent": "0"
-            });
-        }
-    });
-
-});
