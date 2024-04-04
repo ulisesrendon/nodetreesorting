@@ -1,15 +1,11 @@
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
+const urlParams = new URLSearchParams(window.location.search);
 const contentId = urlParams.get('id');
 
-console.log(contentId);
-
-const getNodeData = function () {
-    let nodeList = localStorage.getItem('nodeList') || contentNodes;
-    if (typeof nodeList === 'string') {
-        nodeList = JSON.parse(nodeList);
-    }
-    return nodeList;
+const getNodeData = async function (contentId) {
+    const response = await fetch(`http://api.localhost/v2/content/type/${contentId}`);
+    const {data} = await response.json();
+    const {fields} = data;
+    return fields ?? [];
 };
 
 const schemaSave = function (nodeMap){
@@ -33,18 +29,15 @@ const schemaSave = function (nodeMap){
     localStorage.setItem('nodeList', JSON.stringify(updatedNodeList));
 };
 
-document.addEventListener('DOMContentLoaded', function(){
-
+document.addEventListener('DOMContentLoaded', async function(){
     // Rendering the tree nodes and prepare a map that contains references to the nodes 
-    let Map = treeNodeRender(getNodeData(), treeBase);
-    for(i in Map){
+    let Map = treeNodeRender(await getNodeData(contentId), treeBase);
+    for (i in Map) {
         nodeMap[i] = Map[i];
     }
-
+    
     // Set the save schema button function
-    const schemaUpdateSave = document.querySelector("#schemaUpdateSave");
-    schemaUpdateSave.addEventListener('click', function () {
+    document.querySelector("#schemaUpdateSave").addEventListener('click', function () {
         schemaSave(nodeMap);
     });
-
 });

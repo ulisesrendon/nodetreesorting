@@ -1,16 +1,12 @@
-let nodeOptionList = [];
-let getNodeOptionList = async function () {
+const getNodeOptionList = async function () {
     const response = await fetch('http://api.localhost/v2/content/field', {
         headers: {
             'X-Apikey': 'd0f41572a37701fb4a3fc7774d01d63c78b729d4852863dd48bad69868ef462d7b1c39fa16ee7dd86e53829e48bc60d24f773b7ee68c9e9ce7e789a68c2adc22',
         }
     });
-    if (response.ok) {
-        const list = await response.json();
-        nodeOptionList = list.data;
-        return list.data;
-    }
-    return [];
+    const list = await response.json();
+    const {data} = list;
+    return data ?? [];
 };
 
 const nodeItemBase = document.createElement('div');
@@ -115,47 +111,46 @@ const schemaUpdateAddNode = function(nodeData){
     return Math.floor(Math.random() * 1000);
 };
 
+const schemaDeleteNode = function(nodeId){
+    const nodeToRemove = nodeMap[nodeId] || null;
+    if (nodeToRemove) {
+        nodeToRemove.render.remove();
+        delete nodeMap[nodeId];
+    }
+};
+
 // map that contains references to the nodes 
 const nodeMap = []
 
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', async function(){
     // Schema container must be sortable and must have data-id="0" as attribute
     const treeBase = treeBasePrepare(document.querySelector("#treeBase"));
 
-
     // Set the schema deleting function
-    const schemaDeleteNode = document.querySelector(".schemaDeleteNode");
-    schemaDeleteNode.addEventListener('click', function () {
-        const nodeToRemove = nodeMap[selectedNodeId.value] || null;
-        console.log(nodeToRemove);
-        if (nodeToRemove) {
-            nodeToRemove.render.remove();
-            delete nodeMap[selectedNodeId.value];
-        }
+    document.querySelector(".schemaDeleteNode").addEventListener('click', function () {
+        cschemaDeleteNode(selectedNodeId.value);        
     });
 
-
     // Render the available node option list
-    getNodeOptionList().then(function(){     
-        const optionListContainer = document.querySelector(".optionListContainer");
-        const optionNodeMap = presentOptionNodeList(nodeOptionList);
-        const optionListSelector = prepareOptionList(optionNodeMap);
-        optionListContainer.appendChild(optionListSelector);
-    
-        const schemaCreateNode = document.querySelector(".schemaCreateNode");
-        schemaCreateNode.addEventListener('click', function(){
-            if (optionListSelector.value != 0 ){
-                const optionSelected = optionNodeMap[optionListSelector.value];
-                const newNodeId = schemaUpdateAddNode(optionSelected);
-    
-                addTreeNode(treeBase, nodeMap, {
-                    "id": newNodeId,
-                    "title": optionSelected.title,
-                    "type": optionSelected.name,
-                    "parent": "0"
-                });
-            }
-        });
+    const optionListContainer = document.querySelector(".optionListContainer");
+    const optionNodeMap = presentOptionNodeList(getNodeOptionList());
+    const optionListSelector = prepareOptionList(optionNodeMap);
+    optionListContainer.appendChild(optionListSelector);
+
+    // Set the schema adding node function
+    const schemaCreateNode = document.querySelector(".schemaCreateNode");
+    schemaCreateNode.addEventListener('click', function () {
+        if (optionListSelector.value != 0) {
+            const optionSelected = optionNodeMap[optionListSelector.value];
+            const newNodeId = schemaUpdateAddNode(optionSelected);
+
+            addTreeNode(treeBase, nodeMap, {
+                "id": newNodeId,
+                "title": optionSelected.title,
+                "type": optionSelected.name,
+                "parent": "0"
+            });
+        }
     });
 
 });
