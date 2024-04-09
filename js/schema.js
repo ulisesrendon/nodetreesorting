@@ -1,7 +1,7 @@
 const getNodeOptionList = async function () {
     const response = await fetch('http://api.localhost/v2/content/field', {
         headers: {
-            'X-Apikey': 'd0f41572a37701fb4a3fc7774d01d63c78b729d4852863dd48bad69868ef462d7b1c39fa16ee7dd86e53829e48bc60d24f773b7ee68c9e9ce7e789a68c2adc22',
+            "x-session": localStorage.getItem('session') ?? null,
         }
     });
     const list = await response.json();
@@ -10,7 +10,11 @@ const getNodeOptionList = async function () {
 };
 
 const getNodeDataById = async function (contentId) {
-    const response = await fetch(`http://api.localhost/v2/content/type/${contentId}?unordered`);
+    const response = await fetch(`http://api.localhost/v2/content/type/${contentId}?unordered`, {
+        headers: {
+            "x-session": localStorage.getItem('session') ?? null
+        }
+    });
     const { data } = await response.json();
     const { fields } = data;
     return fields ?? [];
