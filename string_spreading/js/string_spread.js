@@ -15,6 +15,5 @@ const parseNode = node => {
 window.addEventListener('load', function(){
     this.document.querySelector('#spreadstringform').addEventListener('submit', function(e){
         e.preventDefault();
-        console.log(parseNode(this.querySelector("#source")));
     });
 });

@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     for (let i = 0; i < response.length; i++) {
         const item = document.createElement("li");
         item.innerHTML = `
-            <div>${response[i].title}</div>
+            <div>${response[i].id} - ${response[i].title}</div>
             <div><a href="schema-update.html?id=${response[i].id}">Editar</a></div>
         `;
         schemaListContainer.appendChild(item);

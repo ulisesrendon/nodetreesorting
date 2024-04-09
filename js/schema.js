@@ -10,7 +10,7 @@ const getNodeOptionList = async function () {
 };
 
 const getNodeDataById = async function (contentId) {
-    const response = await fetch(`http://api.localhost/v2/content/type/${contentId}`);
+    const response = await fetch(`http://api.localhost/v2/content/type/${contentId}?unordered`);
     const { data } = await response.json();
     const { fields } = data;
     return fields ?? [];

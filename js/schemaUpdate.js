@@ -18,6 +18,18 @@ const schemaSave = function (nodeMap){
             "type": nodeMap[id].data.type,
             "parent": nodeMap[id].render.parentNode.getAttribute('data-id')
         });
+
+        fetch(`http://api.localhost/v2/content/type/field/${nodeMap[id].data.id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "x-session": localStorage.getItem('session') ?? null
+            },
+            body: JSON.stringify({
+                weight: nodeMap[id].weight,
+                parent: nodeMap[id].render.parentNode.getAttribute('data-id')
+            })
+        });
     }
     localStorage.setItem('nodeList', JSON.stringify(updatedNodeList));
 };
@@ -82,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     });
 
     // Set the save schema button function
-    // document.querySelector("#schemaUpdateSave").addEventListener('click', function () {
-    //     schemaSave(nodeMap);
-    // });
+    document.querySelector("#schemaUpdateSave").addEventListener('click', function () {
+        schemaSave(nodeMap);
+    });
 });
