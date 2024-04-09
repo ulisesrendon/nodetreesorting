@@ -13,8 +13,6 @@ document.querySelector('.loginform').addEventListener('submit', async function(e
     });
 
     const { session } = await userAccess.json();
-
     localStorage.setItem('session', session);
-    
     window.location.href = 'index.html';
 });

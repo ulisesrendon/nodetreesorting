@@ -3,16 +3,16 @@ const getSchemaList = async function(){
     const {data} = await response.json();
     return data ?? [];
 };
-const schemaListContainer = document.querySelector(".schemaList");
 
 document.addEventListener('DOMContentLoaded', async function(){
-    const response = await getSchemaList();
-    for (let i = 0; i < response.length; i++) {
+    const schemaListContainer = document.querySelector(".schemaList");
+    const SchemaList = await getSchemaList();
+    SchemaList.forEach(function(schema){
         const item = document.createElement("li");
         item.innerHTML = `
-            <div>${response[i].id} - ${response[i].title}</div>
-            <div><a href="schema-update.html?id=${response[i].id}">Editar</a></div>
+                <div><a href="schema-update.html?id=${schema.id}" class="block-anchor">${schema.id} - ${schema.title}</a></div>
+                <div><a href="schema-update-data.html?id=${schema.id}">Editar</a></div>
         `;
         schemaListContainer.appendChild(item);
-    }
+    });
 });

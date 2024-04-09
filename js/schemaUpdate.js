@@ -10,15 +10,7 @@ const schemaSave = function (nodeMap){
         return a.weight - b.weight;
     });
 
-    let updatedNodeList = [];
     for (id in nodeMap) {
-        updatedNodeList.push({
-            "id": nodeMap[id].data.id,
-            "title": nodeMap[id].data.title,
-            "type": nodeMap[id].data.type,
-            "parent": nodeMap[id].render.parentNode.getAttribute('data-id')
-        });
-
         fetch(`http://api.localhost/v2/content/type/field/${nodeMap[id].data.id}`, {
             method: "PATCH",
             headers: {
@@ -31,7 +23,26 @@ const schemaSave = function (nodeMap){
             })
         });
     }
-    localStorage.setItem('nodeList', JSON.stringify(updatedNodeList));
+};
+
+const schemaNodeDeletePersist = function (nodeId) {
+    fetch(`http://api.localhost/v2/content/type/field/${nodeId}`, {
+        method: "DELETE",
+        headers: {
+            "x-session": localStorage.getItem('session') ?? null
+        }
+    });
+};
+
+const schemaNodeAddPersist = async function (nodeId, contentId) {
+    const response = await fetch(`http://api.localhost/v2/content/type/${contentId}/field_assign/${nodeId}`, {
+        method: "POST",
+        headers: {
+            "x-session": localStorage.getItem('session') ?? null
+        }
+    });
+    const { data } = await response.json();
+    return data.relationshipID;
 };
 
 document.addEventListener('DOMContentLoaded', async function(){
@@ -57,7 +68,15 @@ document.addEventListener('DOMContentLoaded', async function(){
     };
 
     // Rendering the tree nodes and prepare a map that contains references to the nodes
-    const nodeMap = treeNodeRender(await getNodeDataById(contentId), treeBase, updateSelectedNodeState);
+    const nodeData = await getNodeDataById(contentId);
+    const nodeMap = treeNodeRender(nodeData.fields, treeBase, updateSelectedNodeState);
+
+    [...document.querySelectorAll('.render-text-schema-title')].forEach(function(item){
+        item.innerHTML = nodeData.title;
+    });
+    [...document.querySelectorAll('.render-text-schema-id')].forEach(function(item){
+        item.innerHTML = nodeData.id;
+    });
 
     // Render the available node option list selector
     const optionListContainer = document.querySelector(".optionListContainer");
@@ -66,11 +85,11 @@ document.addEventListener('DOMContentLoaded', async function(){
     optionListContainer.appendChild(optionListSelector);
 
     // Set the schema adding node function
-    document.querySelector(".schemaCreateNode").addEventListener('click', function () {
+    document.querySelector(".schemaCreateNode").addEventListener('click', async function () {
         if (optionListSelector.value != 0) {
             const optionSelected = optionNodeMap[optionListSelector.value];
             const newNodeData = {
-                "id": schemaUpdateAddNode(optionSelected),
+                "id": await schemaNodeAddPersist(optionSelected.id, contentId),
                 "title": optionSelected.title,
                 "type": optionSelected.name,
                 "parent": 0
@@ -86,6 +105,8 @@ document.addEventListener('DOMContentLoaded', async function(){
 
     // Set the schema deleting function
     document.querySelector(".schemaDeleteNode").addEventListener('click', function () {
+        const nodeId = getSelectedNodeSate().id;
+        schemaNodeDeletePersist(nodeId);
         schemaDeleteNode(getSelectedNodeSate().id, nodeMap);
         updateSelectedNodeState({
             id: 0,

@@ -16,8 +16,7 @@ const getNodeDataById = async function (contentId) {
         }
     });
     const { data } = await response.json();
-    const { fields } = data;
-    return fields ?? [];
+    return data ?? {};
 };
 
 const nodeItemBase = document.createElement('div');
@@ -29,7 +28,7 @@ const nodeRender = function (node, updateSeletedNodeState) {
     newItem.setAttribute('data-id', node.id);
     newItem.setAttribute('data-title', node.title);
     newItem.classList.add('nodeitem');
-    newItem.innerHTML = `${node.title} (field_${node.id})`;
+    newItem.innerHTML = `${node.title} (id_${node.id})`;
     new Sortable(newItem, {
         group: 'nested',
         animation: 150,
@@ -112,10 +111,6 @@ const addTreeNode = function (treeBase, nodeMap, nodeItem, updateSeletedNodeStat
         "data": nodeItem
     };
     treeBase.appendChild(nodeMap[nodeItem.id].render);
-};
-
-const schemaUpdateAddNode = function(nodeData){
-    return Math.floor(Math.random() * 1000);
 };
 
 const schemaDeleteNode = function (nodeId, nodeMap){

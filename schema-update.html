@@ -10,7 +10,7 @@
 
 <body class="dark">
     <div class="container">
-        <h2>Schema Editor</h2>
+        <h2>Updating schema: <span class="render-text-schema-title"></span> (<span class="render-text-schema-id"></span>)</h2>
         <div class="container"><a href="index.html">Volver</a></div>
         <div id="treeBase" class="list-group-item nested-sortable"></div>
         <button type="button" id="schemaUpdateSave">Guardar</button>
@@ -32,6 +32,7 @@
     <script>
         const contentNodes = [];
     </script>
+    <script src="js/session.js"></script>
     <script src="js/Sortable.min.js"></script>
     <script src="js/schema.js"></script>
     <script src="js/schemaUpdate.js"></script>
