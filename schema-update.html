@@ -20,14 +20,14 @@
             <button type="button" class="schemaCreateNode">Añadir campo</button>
         </div>
         <form class="container">
-            <div>
-                <input type="text" name="node_id" id="node_id" value="0" readonly>
+            <div class="form-field">
+                <input class="form-field-block" type="hidden" name="node_id" id="node_id" value="0" readonly>
             </div>
-            <div>
-                <input type="text" name="node_title" id="node_title" value="" readonly>
+            <div class="form-field">
+                <input class="form-field-block" type="text" name="node_title" id="node_title" value="" readonly>
             </div>
-            <div>
-                <textarea name="node_config" id="node_config"readonly></textarea>
+            <div class="form-field">
+                <textarea class="form-field-block" name="node_config" id="node_config"></textarea>
             </div>
             <button type="button" id="delete_node" class="schemaDeleteNode">Eliminar</button>
         </form>

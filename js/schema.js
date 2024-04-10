@@ -4,8 +4,7 @@ const getNodeOptionList = async function () {
             "x-session": localStorage.getItem('session') ?? null,
         }
     });
-    const list = await response.json();
-    const {data} = list;
+    const {data} = await response.json();
     return data ?? [];
 };
 

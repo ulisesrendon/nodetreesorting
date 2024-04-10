@@ -54,9 +54,10 @@ document.addEventListener('DOMContentLoaded', async function(){
     const selectedNodeTitle = document.querySelector('#node_title');
     const selectedNodeConfig = document.querySelector('#node_config');
     const updateSelectedNodeState = function ({ id, title, config }) {
+        console.log(config)
         selectedNodeId.value = id;
         selectedNodeTitle.value = title;
-        selectedNodeConfig.value = config;
+        selectedNodeConfig.value = JSON.stringify(config);
         return {
             id: selectedNodeId.value,
             title: selectedNodeTitle.value,
@@ -66,7 +67,8 @@ document.addEventListener('DOMContentLoaded', async function(){
     const getSelectedNodeSate = function(){
         return { 
             id: selectedNodeId.value, 
-            title: selectedNodeTitle.value
+            title: selectedNodeTitle.value,
+            config: selectedNodeConfig.value,
         };
     };
 
@@ -80,7 +82,6 @@ document.addEventListener('DOMContentLoaded', async function(){
     [...document.querySelectorAll('.render-text-schema-id')].forEach(function(item){
         item.innerHTML = nodeData.id;
     });
-    await console.log(getNodeOptionList());
 
     // Render the available node option list selector
     const optionListContainer = document.querySelector(".optionListContainer");
@@ -96,6 +97,7 @@ document.addEventListener('DOMContentLoaded', async function(){
                 "id": await schemaNodeAddPersist(optionSelected.id, contentId),
                 "title": optionSelected.title,
                 "type": optionSelected.name,
+                "config": optionSelected.config,
                 "parent": 0
             };
             addTreeNode(
@@ -109,13 +111,17 @@ document.addEventListener('DOMContentLoaded', async function(){
 
     // Set the schema deleting function
     document.querySelector(".schemaDeleteNode").addEventListener('click', function () {
-        const nodeId = getSelectedNodeSate().id;
-        schemaNodeDeletePersist(nodeId);
-        schemaDeleteNode(getSelectedNodeSate().id, nodeMap);
-        updateSelectedNodeState({
-            id: 0,
-            title: ""
-        });
+        let procedDeletion = confirm("Are you sure?");
+        if(procedDeletion){
+            const nodeId = getSelectedNodeSate().id;
+            schemaNodeDeletePersist(nodeId);
+            schemaDeleteNode(getSelectedNodeSate().id, nodeMap);
+            updateSelectedNodeState({
+                id: 0,
+                title: "",
+                config: "{}"
+            });
+        }
     });
 
     // Set the save schema button function
