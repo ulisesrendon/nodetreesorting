@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', async function(){
         item.innerHTML = nodeData.id;
     });
 
+    const NavLinks = document.querySelector('.nav-links');
+    NavLinks.innerHTML += ` <a href="schema-update.html?id=${contentId}">Nodos</a>`;
+
     updateForm.addEventListener('submit', async function(e){
         e.preventDefault();
 

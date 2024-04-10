@@ -52,12 +52,15 @@ document.addEventListener('DOMContentLoaded', async function(){
     // Inputs that contains the selected node state
     const selectedNodeId = document.querySelector('#node_id');
     const selectedNodeTitle = document.querySelector('#node_title');
-    const updateSelectedNodeState = function ({ id, title }) {
+    const selectedNodeConfig = document.querySelector('#node_config');
+    const updateSelectedNodeState = function ({ id, title, config }) {
         selectedNodeId.value = id;
         selectedNodeTitle.value = title;
+        selectedNodeConfig.value = config;
         return {
             id: selectedNodeId.value,
-            title: selectedNodeTitle.value
+            title: selectedNodeTitle.value,
+            config: selectedNodeConfig.value
         };
     }
     const getSelectedNodeSate = function(){
@@ -77,6 +80,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     [...document.querySelectorAll('.render-text-schema-id')].forEach(function(item){
         item.innerHTML = nodeData.id;
     });
+    await console.log(getNodeOptionList());
 
     // Render the available node option list selector
     const optionListContainer = document.querySelector(".optionListContainer");
@@ -118,4 +122,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     document.querySelector("#schemaUpdateSave").addEventListener('click', function () {
         schemaSave(nodeMap);
     });
+
+    const NavLinks = document.querySelector('.nav-links');
+    NavLinks.innerHTML += ` <a href="schema-update-data.html?id=${contentId}">Data</a>`;
 });

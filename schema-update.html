@@ -11,7 +11,7 @@
 <body class="dark">
     <div class="container">
         <h2>Updating schema: <span class="render-text-schema-title"></span> (<span class="render-text-schema-id"></span>)</h2>
-        <div class="container"><a href="index.html">Volver</a></div>
+        <div class="container nav-links"><a href="index.html">Volver</a></div>
         <div id="treeBase" class="list-group-item nested-sortable"></div>
         <button type="button" id="schemaUpdateSave">Guardar</button>
 
@@ -25,6 +25,9 @@
             </div>
             <div>
                 <input type="text" name="node_title" id="node_title" value="" readonly>
+            </div>
+            <div>
+                <textarea name="node_config" id="node_config"readonly></textarea>
             </div>
             <button type="button" id="delete_node" class="schemaDeleteNode">Eliminar</button>
         </form>
