@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     updateForm.name.value = nodeData.name;
     updateForm.title.value = nodeData.title;
     updateForm.description.value = nodeData.description;
-    updateForm.config.value = nodeData.config;
+    updateForm.config.value = JSON.stringify(nodeData.config);
 
     [...document.querySelectorAll('.render-text-schema-title')].forEach(function(item){
         item.innerHTML = nodeData.title;
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async function(){
             {
                 name: this.name.value,
                 title: this.title.value,
-                description: this.title.value,
+                description: this.description.value,
                 config: JSON.parse(this.config.value),
             }
         );

@@ -119,3 +119,14 @@ const schemaDeleteNode = function (nodeId, nodeMap){
         delete nodeMap[nodeId];
     }
 };
+
+function eventChangeImplementation( element ){
+	const evt = new Event('change');
+	const trackChange = function(element) {
+		const observer = new window.MutationObserver(function(mutations, observer) {
+			if(mutations[0].attributeName == "value") element.dispatchEvent(evt);
+		});
+		observer.observe(element, {attributes: true});
+	}
+	trackChange( element );
+}

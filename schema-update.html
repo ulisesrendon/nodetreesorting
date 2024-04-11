@@ -11,25 +11,31 @@
 <body class="dark">
     <div class="container">
         <h2>Updating schema: <span class="render-text-schema-title"></span> (<span class="render-text-schema-id"></span>)</h2>
-        <div class="container nav-links"><a href="index.html">Volver</a></div>
-        <div id="treeBase" class="list-group-item nested-sortable"></div>
-        <button type="button" id="schemaUpdateSave">Guardar</button>
 
+        <div class="container nav-links"><a href="index.html">Volver</a></div>
+
+        <div id="treeBase" class="list-group-item nested-sortable"></div>
+
+        <button type="button" id="schemaUpdateSave">Guardar</button>
+        
         <div class="container optionlist-container">
             <div class="optionListContainer"></div>
             <button type="button" class="schemaCreateNode">Añadir campo</button>
         </div>
-        <form class="container">
+
+        <form class="container node-update-form">
+            <input class="form-field-block onchange_implement" type="hidden" name="node_id" id="node_id" value="0" readonly>
             <div class="form-field">
-                <input class="form-field-block" type="hidden" name="node_id" id="node_id" value="0" readonly>
+                <button type="button" id="delete_node" class="schemaDeleteNode">Delete node <span class="render-text-node-title"></span> (<span class="render-text-node-id"></span>)</button>
             </div>
+            <h2>Node data</h2>
             <div class="form-field">
-                <input class="form-field-block" type="text" name="node_title" id="node_title" value="" readonly>
+                <input class="form-field-block" type="text" name="node_title" id="node_title" value="">
             </div>
             <div class="form-field">
                 <textarea class="form-field-block" name="node_config" id="node_config"></textarea>
             </div>
-            <button type="button" id="delete_node" class="schemaDeleteNode">Eliminar</button>
+            <button type="submit">Update node</button>
         </form>
     </div>
     <script>
