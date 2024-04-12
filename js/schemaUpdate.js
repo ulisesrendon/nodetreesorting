@@ -1,7 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const contentId = urlParams.get('id');
 
-const schemaSave = function (nodeMap){
+const schemaSave = async function (nodeMap){
     for (id in nodeMap) {
         nodeMap[id].weight = Array.from(nodeMap[id].render.parentNode.children).indexOf(nodeMap[id].render);
     }
@@ -10,18 +10,36 @@ const schemaSave = function (nodeMap){
         return a.weight - b.weight;
     });
 
+    const urlList = [];
     for (id in nodeMap) {
-        fetch(`http://api.localhost/v2/content/type/field/${nodeMap[id].data.id}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "x-session": localStorage.getItem('session') ?? null
-            },
+        urlList.push({
+            url: `http://api.localhost/v2/content/type/field/${nodeMap[id].data.id}`,
             body: JSON.stringify({
                 weight: nodeMap[id].weight,
                 parent: nodeMap[id].render.parentNode.getAttribute('data-id')
             })
         });
+    }
+
+    try{
+        const fetchPromises = urlList.map(async (item) => {
+            const response = await fetch(item.url,{
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-session": localStorage.getItem('session') ?? null
+                },
+                body: item.body
+            });
+            return response.json();
+        });
+    
+        // Use Promise.all to wait for all the fetch requests to resolve
+        const results = await Promise.all(fetchPromises);
+
+        return results;
+    } catch (error) {
+        alert("Error: Scheme data could not be processed");
     }
 };
 
@@ -77,8 +95,39 @@ const getSelectedNodeState = function () {
     return SelectedNodeState;
 };
 
+const addNodeActionProcess = async function ({
+    treeBase, 
+    nodeMap, 
+    contentId, 
+    optionNodeMap, 
+    newNodeId,
+    updateSelectedNodeState
+}) {
+    if (newNodeId != 0) {
+        const optionSelected = optionNodeMap[newNodeId];
+        const newNodeData = {
+            "id": await schemaNodeAddPersist(optionSelected.id, contentId),
+            "title": optionSelected.title,
+            "type": optionSelected.name,
+            "config": optionSelected.config,
+            "parent": 0
+        };
+        addTreeNode(
+            treeBase,
+            nodeMap,
+            newNodeData,
+            updateSelectedNodeState
+        );
+    }
+};
+
 
 document.addEventListener('DOMContentLoaded', async function(){
+
+    [...document.querySelectorAll('.onchange_implement')].map(function (item) {
+        eventChangeImplementation(item);
+    });
+
     // Schema container must be sortable and must have data-id="0" as attribute
     const treeBase = treeBasePrepare(document.querySelector("#treeBase"));
 
@@ -114,33 +163,24 @@ document.addEventListener('DOMContentLoaded', async function(){
     const optionNodeMap = presentOptionNodeList(await getNodeOptionList());
     const optionListSelector = prepareOptionList(optionNodeMap);
     const activeNodeSelector = optionListSelector.cloneNode(true);
-    optionListContainer.appendChild(optionListSelector);
     schemaNodeTypeSelector.appendChild(activeNodeSelector);
+    optionListContainer.appendChild(optionListSelector);
 
     // Set the schema adding node function
-    document.querySelector(".schemaCreateNode").addEventListener('click', async function () {
-        if (optionListSelector.value != 0) {
-            const optionSelected = optionNodeMap[optionListSelector.value];
-            const newNodeData = {
-                "id": await schemaNodeAddPersist(optionSelected.id, contentId),
-                "title": optionSelected.title,
-                "type": optionSelected.name,
-                "config": optionSelected.config,
-                "parent": 0
-            };
-            addTreeNode(
-                treeBase,
-                nodeMap,
-                newNodeData,
-                updateSelectedNodeState
-            );
-        }
+    document.querySelector(".schemaCreateNode").addEventListener('click', function () {
+        addNodeActionProcess({
+            treeBase: treeBase,
+            nodeMap: nodeMap,
+            contentId: contentId,
+            optionNodeMap: optionNodeMap,
+            newNodeId: optionListSelector.value,
+            updateSelectedNodeState: updateSelectedNodeState
+        })
     });
 
     // Set the schema deleting function
     document.querySelector(".schemaDeleteNode").addEventListener('click', function () {
-        let procedDeletion = confirm("Are you sure?");
-        if(procedDeletion){
+        if (confirm("Are you sure?")){
             const nodeId = getSelectedNodeState().id;
             schemaNodeDeletePersist(nodeId);
             schemaDeleteNode(nodeId, nodeMap);
@@ -154,13 +194,12 @@ document.addEventListener('DOMContentLoaded', async function(){
     });
 
     // Set the save schema button function
-    document.querySelector("#schemaUpdateSave").addEventListener('click', function () {
-        schemaSave(nodeMap);
+    document.querySelector("#schemaUpdateSave").addEventListener('click', async function () {
+        const result = await schemaSave(nodeMap);
     });
 
     // Link go to scheme data update
-    const NavLinks = document.querySelector('.nav-links');
-    NavLinks.innerHTML += ` <a href="schema-update-data.html?id=${contentId}">Schema data</a>`;
+    document.querySelector('.nav-links').innerHTML += ` <a href="schema-update-data.html?id=${contentId}">Schema data</a>`;
 
     [...document.querySelectorAll('.render-text-schema-title')].forEach(function (item) {
         item.innerHTML = nodeData.title;
@@ -169,9 +208,6 @@ document.addEventListener('DOMContentLoaded', async function(){
         item.innerHTML = nodeData.id;
     });
 
-    [...document.querySelectorAll('.onchange_implement')].map(function(item){
-        eventChangeImplementation(item);
-    });
     const nodeUpdateForm = document.querySelector('.node-update-form');
     nodeUpdateForm.style.display = "none";
     nodeUpdateForm.addEventListener("click", function(e){
@@ -179,7 +215,6 @@ document.addEventListener('DOMContentLoaded', async function(){
     });
     nodeUpdateForm.addEventListener("submit", function(e){
         e.preventDefault();
-
         nodeUpdatePersist({
             id: getSelectedNodeState().id,
             field_id: activeNodeSelector.value,
@@ -187,25 +222,24 @@ document.addEventListener('DOMContentLoaded', async function(){
         });
     });
     selectedNodeId.addEventListener('change', function(){
+        const {id, title, description, field_id} = getSelectedNodeState();
+        activeNodeSelector.value = field_id;
         if (nodeUpdateForm.style.display == 'none'){
             nodeUpdateForm.style.display = 'block';
         }
-        if (getSelectedNodeState().id == 0){
+        if (id == 0){
             nodeUpdateForm.style.display = 'none';
         }
 
-        activeNodeSelector.value = getSelectedNodeState().field_id;
-
         [...document.querySelectorAll('.render-text-node-id')].map(function (item) {
-            item.innerHTML = getSelectedNodeState().id;
+            item.innerHTML = id;
         });
         [...document.querySelectorAll('.render-text-node-title')].map(function (item) {
-            item.innerHTML = getSelectedNodeState().title;
+            item.innerHTML = title;
         });
         [...document.querySelectorAll('.render-text-node-description')].map(function (item) {
-            item.innerHTML = getSelectedNodeState().description;
+            item.innerHTML = description;
         });
-  
     });
     document.querySelector("body").addEventListener("click", function(){
         nodeUpdateForm.style.display = "none";
