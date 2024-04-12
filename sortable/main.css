@@ -1,0 +1,24 @@
+.nested-sortable,
+.nested-1,
+.nested-2,
+.nested-3 {
+    margin-top: 5px;
+}
+.nested-1 {
+    background-color: #e6e6e6;
+}
+.nested-2 {
+    background-color: #cccccc;
+}
+.nested-3 {
+    background-color: #b3b3b3;
+}
+.selected {
+    background-color: #f9c7c8;
+    border: solid red 1px !important;
+    z-index: 1 !important;
+}
+
+.highlight {
+    background-color: #B7F8C7;
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SortableJS</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.5" />
+</head>
+
+<body>
+    <div class="container">
+        <div id="nested" class="row">
+            <h4 class="col-12">Nested Sortables Example</h4>
+
+            <div id="nestedDemo" class="list-group col nested-sortable">
+                <div class="list-group-item nested-1">Item 3.1
+                    <div class="list-group nested-sortable">
+                    </div>
+                </div>
+                <div class="list-group-item nested-1">Item 3.2
+                    <div class="list-group nested-sortable">
+                    </div>
+                </div>
+                <div class="list-group-item nested-1">Item 3.3
+                    <div class="list-group nested-sortable">
+                    </div>
+                </div>
+                <div class="list-group-item nested-1">Item 3.4
+                    <div class="list-group nested-sortable">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Latest Sortable -->
+    <script src="../js/Sortable.min.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>

@@ -80,11 +80,11 @@ const prepareOptionList = function(nodeOptionList){
     nodeOptionList[0] = {
         "id": "",
         "name": "",
-        "title": "Pick an option"
+        "title": "Seleccione una opción"
     };
 
     const optionSelect = document.createElement("select");
-    optionSelect.classList.add('form-field-block');
+    optionSelect.classList.add
     const optionItem = document.createElement("option");
     for (i in nodeOptionList){
         const newItem = optionItem.cloneNode();
