@@ -12,30 +12,32 @@
     <div class="container">
         <h2>Updating schema: <span class="render-text-schema-title"></span> (<span class="render-text-schema-id"></span>)</h2>
 
-        <div class="container nav-links"><a href="index.html">Volver</a></div>
+        <div class="container nav-links"><a href="index.html">Index</a></div>
+
+        <div class="container">
+            <h2>Add new node</h2>
+            <div class="optionListContainer form-field"></div>
+            <button type="button" class="schemaCreateNode">Add node</button>
+        </div>
 
         <div id="treeBase" class="list-group-item nested-sortable"></div>
 
-        <button type="button" id="schemaUpdateSave">Guardar</button>
-        
-        <div class="container optionlist-container">
-            <div class="optionListContainer"></div>
-            <button type="button" class="schemaCreateNode">Añadir campo</button>
+        <div class="form-field">
+            <button type="button" id="schemaUpdateSave">Update node structure</button>
         </div>
 
         <form class="container node-update-form">
-            <input class="form-field-block onchange_implement" type="hidden" name="node_id" id="node_id" value="0" readonly>
-            <div class="form-field">
-                <button type="button" id="delete_node" class="schemaDeleteNode">Delete node <span class="render-text-node-title"></span> (<span class="render-text-node-id"></span>)</button>
-            </div>
-            <h2>Node data</h2>
-            <div class="form-field">
-                <input class="form-field-block" type="text" name="node_title" id="node_title" value="">
+            <input class="onchange_implement" type="hidden" name="node_id" id="node_id" value="0" readonly>
+            <input class="onchange_implement" type="hidden" name="node_field_id" id="node_field_id" value="0" readonly>
+            <h2>Node data: <span class="render-text-node-title"></span> (id_<span class="render-text-node-id"></span>)</h2>
+            <h4 class="render-text-node-description">No node description yet</h4>
+            <div class="form-field schema-node-type-selector">
             </div>
             <div class="form-field">
-                <textarea class="form-field-block" name="node_config" id="node_config"></textarea>
+                <textarea class="form-field-block" name="node_config" id="node_config" rows="8"></textarea>
             </div>
             <button type="submit">Update node</button>
+            <button type="button" id="delete_node" class="schemaDeleteNode">Delete node </button>
         </form>
     </div>
     <script>

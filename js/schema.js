@@ -80,10 +80,11 @@ const prepareOptionList = function(nodeOptionList){
     nodeOptionList[0] = {
         "id": "",
         "name": "",
-        "title": "Seleccione una opción"
+        "title": "Pick an option"
     };
 
     const optionSelect = document.createElement("select");
+    optionSelect.classList.add('form-field-block');
     const optionItem = document.createElement("option");
     for (i in nodeOptionList){
         const newItem = optionItem.cloneNode();
@@ -122,11 +123,8 @@ const schemaDeleteNode = function (nodeId, nodeMap){
 
 function eventChangeImplementation( element ){
 	const evt = new Event('change');
-	const trackChange = function(element) {
-		const observer = new window.MutationObserver(function(mutations, observer) {
-			if(mutations[0].attributeName == "value") element.dispatchEvent(evt);
-		});
-		observer.observe(element, {attributes: true});
-	}
-	trackChange( element );
+    const observer = new window.MutationObserver(function (mutations, observer) {
+        if (mutations[0].attributeName == "value") element.dispatchEvent(evt);
+    });
+    observer.observe(element, { attributes: true });
 }
