@@ -20,24 +20,26 @@ const getNodeDataById = async function (contentId) {
 
 const nodeItemBase = document.createElement('div');
 nodeItemBase.classList.add('list-group-item');
-nodeItemBase.classList.add('nested-sortable');
+// nodeItemBase.classList.add('nested-sortable');
 nodeItemBase.classList.add('nested');
 const nodeRender = function (node, updateSeletedNodeState) {
     const newItem = nodeItemBase.cloneNode();
     newItem.setAttribute('data-id', node.id);
     newItem.setAttribute('data-title', node.title);
     newItem.classList.add('nodeitem');
-    newItem.innerHTML = `${node.title} (id_${node.id})`;
-    new Sortable(newItem, {
+    newItem.innerHTML = `
+        ${node.title} (id_${node.id})<div class="nested-sortable" data-id="${node.id}"></div>
+    `;
+    new Sortable(newItem.querySelector('.nested-sortable'), {
         group: 'nested',
         animation: 150,
         fallbackOnBody: true,
-        swapThreshold: 0.65,
-        fallbackTolerance: '20px',
-        emptyInsertThreshold: 10,
-        sort: true,
-        swapThreshold: 1,
-        direction: 'vertical'
+        swapThreshold: 0.1,
+        // fallbackTolerance: '20px',
+        // emptyInsertThreshold: 10,
+        // sort: true,
+        // swapThreshold: 1,
+        // direction: 'vertical'
     });
     newItem.addEventListener('click', function(e){
         e.stopPropagation()
@@ -52,12 +54,12 @@ const treeBasePrepare = function(treeBase){
         group: 'nested',
         animation: 150,
         fallbackOnBody: true,
-        swapThreshold: 0.65,
-        fallbackTolerance: '20px',
-        emptyInsertThreshold: 10,
-        sort: true,
-        swapThreshold: 1,
-        direction: 'vertical'
+        swapThreshold: 0.1,
+        // fallbackTolerance: '20px',
+        // emptyInsertThreshold: 10,
+        // sort: true,
+        // swapThreshold: 1,
+        // direction: 'vertical'
     });
     return treeBase;
 };
@@ -69,7 +71,7 @@ const treeNodeRender = function (nodeList, treeBase, updateSeletedNodeState) {
     }
     for (id in nodeMap) {
         if (nodeMap[id].data.parent != 0 && nodeMap[nodeMap[id].data.parent]) {
-            nodeMap[nodeMap[id].data.parent].render.appendChild(nodeMap[id].render);
+            nodeMap[nodeMap[id].data.parent].render.querySelector('.nested-sortable').appendChild(nodeMap[id].render);
         }
     }
 
