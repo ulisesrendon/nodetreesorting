@@ -34,12 +34,7 @@ const nodeRender = function (node, updateSeletedNodeState) {
         group: 'nested',
         animation: 150,
         fallbackOnBody: true,
-        swapThreshold: 0.1,
-        // fallbackTolerance: '20px',
-        // emptyInsertThreshold: 10,
-        // sort: true,
-        // swapThreshold: 1,
-        // direction: 'vertical'
+        swapThreshold: 0.1
     });
     newItem.addEventListener('click', function(e){
         e.stopPropagation()
@@ -54,12 +49,7 @@ const treeBasePrepare = function(treeBase){
         group: 'nested',
         animation: 150,
         fallbackOnBody: true,
-        swapThreshold: 0.1,
-        // fallbackTolerance: '20px',
-        // emptyInsertThreshold: 10,
-        // sort: true,
-        // swapThreshold: 1,
-        // direction: 'vertical'
+        swapThreshold: 0.1
     });
     return treeBase;
 };
@@ -79,19 +69,32 @@ const treeNodeRender = function (nodeList, treeBase, updateSeletedNodeState) {
 };
 
 const prepareOptionList = function(nodeOptionList){
-    nodeOptionList[0] = {
+    const nodeOptionListSorted = [...nodeOptionList];
+    nodeOptionListSorted[0] = {
         "id": "",
         "name": "",
         "title": "Seleccione una opción"
     };
 
+    nodeOptionListSorted.sort(function(a, b){
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+        return 0;
+    });
+
     const optionSelect = document.createElement("select");
     optionSelect.classList.add
     const optionItem = document.createElement("option");
-    for (i in nodeOptionList){
+    for (i in nodeOptionListSorted){
         const newItem = optionItem.cloneNode();
-        newItem.innerHTML = nodeOptionList[i].title;
-        newItem.setAttribute('value', nodeOptionList[i].id);
+        newItem.innerHTML = nodeOptionListSorted[i].title;
+        newItem.setAttribute('value', nodeOptionListSorted[i].id);
         optionSelect.appendChild(newItem);
     }
 
