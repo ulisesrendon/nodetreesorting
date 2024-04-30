@@ -3,7 +3,6 @@ const pageNumber = urlParams.get('page') ?? 1;
 const perPage = urlParams.get('perpage') ?? 20;
 let orderDirection = urlParams.get('direction') ?? 'asc';
 let orderby = urlParams.get('orderby') ?? 'stock_price';
-
 const directions = {
     true: "asc",
     false: "desc",
@@ -36,19 +35,11 @@ const getItemSoldData = async function ({ pageNumber, perPage, direction, orderb
     };
 };
 
-document.addEventListener("DOMContentLoaded", async function(){
-    const appBase = document.querySelector("#itemsold-app");
-    const ItemSoldData = await getItemSoldData({
-        pageNumber: pageNumber,
-        perPage:perPage,
-        direction: orderDirection,
-        orderby: orderby
-    });
-
-    appBase.innerHTML = `
+const baseAppTemplate = function (pageNumber, totalpages, perPage){
+    return `
         <h1 style="text-align:center">Reporte de productos vendidos</h1>
         <div>
-            <div>Pagina: ${pageNumber}/${ItemSoldData.totalpages}</div>
+            <div>Pagina: ${pageNumber}/${totalpages}</div>
             <div>Productos por pagina: ${perPage}</div>
             <div><button type="button" class="downloadReport">Descargar</button></div>
         </div>
@@ -94,6 +85,52 @@ document.addEventListener("DOMContentLoaded", async function(){
         }
         </style>
     `;
+};
+
+const reportDownloadAction = async function (e) {
+    const ItemSoldData = await getItemSoldData({
+        pageNumber: pageNumber,
+        perPage: perPage,
+        direction: orderDirection,
+        orderby: orderby,
+        csvFormat: true
+    });
+
+    const blob = new Blob([ItemSoldData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.setAttribute('href', url);
+    a.setAttribute('download', `report-${pageNumber}-${perPage}-${orderDirection}-${orderby}.csv`);
+    a.click();
+};
+
+const reportOrderAction = item => {
+    item.addEventListener('click', function () {
+        orderDirection = orderDirection == 'asc' ? 'desc' : 'asc';
+        orderby = item.getAttribute("data-order");
+        window.location.href = `itemsold.html?direction=${orderDirection}&orderby=${orderby}&perpage=${perPage}&page=1`
+    });
+};
+
+const generatePaginator = function ({ selector, totalpages, orderDirection, orderby, perPage }){
+    const paginator = document.querySelector(selector);
+    for (let i = 1; i <= totalpages; i++) {
+        const link = document.createElement('a');
+        link.href = `itemsold.html?direction=${orderDirection}&orderby=${orderby}&perpage=${perPage}&page=${i}`;
+        link.innerHTML = i;
+        paginator.appendChild(link);
+    }
+};
+
+document.addEventListener("DOMContentLoaded", async function(){
+    const ItemSoldData = await getItemSoldData({
+        pageNumber: pageNumber,
+        perPage:perPage,
+        direction: orderDirection,
+        orderby: orderby
+    });
+    const appBase = document.querySelector("#itemsold-app");
+    appBase.innerHTML = baseAppTemplate(pageNumber, ItemSoldData.totalpages, perPage);
 
     const appTable = document.querySelector("#itemsold-app table");
 
@@ -155,39 +192,19 @@ document.addEventListener("DOMContentLoaded", async function(){
 
     }
 
-    const paginator = document.querySelector(".paginator");
-    for (let i = 1; i <=ItemSoldData.totalpages; i++){
-        const link = document.createElement('a');
-        link.href = `itemsold.html?direction=${orderDirection}&orderby=${orderby}&perpage=${perPage}&page=${i}`;
-        link.innerHTML = i;
-        paginator.appendChild(link);
-    }
+
+    generatePaginator({
+        selector: ".paginator",
+        totalpages: ItemSoldData.totalpages,
+        orderDirection: orderDirection, 
+        orderby: orderby, 
+        perPage: perPage
+    });
 
     const orderButtons = [...document.querySelectorAll("[data-order")];
-    orderButtons.forEach(item => {
-        item.addEventListener('click', function(){
-            orderDirection = orderDirection == 'asc' ? 'desc' : 'asc';
-            orderby = item.getAttribute("data-order");
-            window.location.href = `itemsold.html?direction=${orderDirection}&orderby=${orderby}&perpage=${perPage}&page=1`
-        });
-    });
+    orderButtons.forEach(reportOrderAction);
 
     const reportDownloadButton = document.querySelector(".downloadReport");
-    reportDownloadButton.addEventListener('click', async function(e){
-        const ItemSoldData = await getItemSoldData({
-            pageNumber: pageNumber,
-            perPage: perPage,
-            direction: orderDirection,
-            orderby: orderby,
-            csvFormat: true
-        });
-
-        const blob = new Blob([ItemSoldData], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.setAttribute('href', url);
-        a.setAttribute('download', `report-${pageNumber}-${perPage}-${orderDirection}-${orderby}.csv`);
-        a.click();
-    });
+    reportDownloadButton.addEventListener('click', reportDownloadAction);
 
 });
