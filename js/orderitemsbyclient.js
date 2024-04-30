@@ -36,16 +36,29 @@ const getItemSoldData = async function ({ csvFormat }) {
     };
 };
 
-const baseAppTemplate = function (){
+const reportDownloadAction = async function (e) {
+    const ItemSoldData = await getItemSoldData({
+        csvFormat: true
+    });
+
+    const blob = new Blob([ItemSoldData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.setAttribute('href', url);
+    a.setAttribute('download', `report-${search}.csv`);
+    a.click();
+};
+
+const baseAppTemplate = function () {
     return `
         <h1 style="text-align:center">Reporte de productos vendidos por cliente</h1>
-        <div class="d-flex-col">
-            <div><button type="button" class="downloadReport">Descargar reporte</button></div>
-            <form method="get" action="" class="d-flex-col report-search">
+        <div class="centering-cell">
+            <div><a href="itemsold.html">Vista principal</a></div>
+            <form method="get" action="" class="centering-cell report-search">
                 <div><input type="text" name="search" placeholder="Buscar"></div>
                 <div><input type="submit" name="" value="Buscar"></div>
-                <div><a href="itemsold.html">Vista principal</a></div>
             </form>
+            <div><button type="button" class="downloadReport">Descargar reporte</button></div>
         </div>
         
         <table>
@@ -58,43 +71,7 @@ const baseAppTemplate = function (){
                 <th>Order</th>
             </tr>
         </table>
-
-        <style>
-        #itemsold-app table{
-            margin: 0 auto;
-            width: 100%;
-        }
-        #itemsold-app tr:nth-child(even) {
-            background-color: #f0f0f0;
-        }
-        #itemsold-app td {
-            padding: 1rem;
-        }
-        .centering-cell{
-            display: flex;
-            align-items: center;
-            justify-content: center
-        }
-        .d-flex-col{
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-        </style>
     `;
-};
-
-const reportDownloadAction = async function (e) {
-    const ItemSoldData = await getItemSoldData({
-        csvFormat: true
-    });
-
-    const blob = new Blob([ItemSoldData], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.setAttribute('href', url);
-    a.setAttribute('download', `report-${search}.csv`);
-    a.click();
 };
 
 document.addEventListener("DOMContentLoaded", async function(){

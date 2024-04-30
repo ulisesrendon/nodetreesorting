@@ -40,69 +40,6 @@ const getItemSoldData = async function ({ pageNumber, perPage, direction, orderb
     };
 };
 
-const baseAppTemplate = function (pageNumber, totalpages, perPage){
-    return `
-        <h1 style="text-align:center">Reporte de productos vendidos por cliente</h1>
-        <div class="d-flex-col">
-            <div>
-                <div>Pagina: ${pageNumber}/${totalpages}</div>
-                <div>Productos por pagina: ${perPage}</div>
-            </div>
-            <div><button type="button" class="downloadReport">Descargar reporte</button></div>
-            <form method="get" action="" class="d-flex-col report-search">
-                <div><input type="text" name="search" placeholder="Buscar"></div>
-                <div><input type="submit" name="" value="Buscar"></div>
-            </form>
-        </div>
-        
-        <table>
-            <tr>
-                <th data-order="barcode">Barcode ▲</th>
-                <th data-order="product">Descripción ▲</th>
-                <th data-order="stock_price">Valor ▲</th>
-                <th data-order="price">Precio ▲</th>
-                <th data-order="stock">Stock ▲</th>
-                <th>Opciones</th>
-            </tr>
-        </table>
-        <div class="paginator"></div>
-
-        <style>
-        #itemsold-app table{
-            margin: 0 auto;
-            width: 100%;
-        }
-        #itemsold-app tr:nth-child(even) {
-            background-color: #f0f0f0;
-        }
-        #itemsold-app td {
-            padding: 1rem;
-        }
-        .centering-cell{
-            display: flex;
-            align-items: center;
-            justify-content: center
-        }
-        #itemsold-app .paginator{
-            padding: 1rem;
-            text-align:center;
-        }
-        #itemsold-app .paginator a {
-            display: inline-block;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin: 0.2rem;
-        }
-        .d-flex-col{
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-        </style>
-    `;
-};
-
 const reportDownloadAction = async function (e) {
     const ItemSoldData = await getItemSoldData({
         pageNumber: pageNumber,
@@ -138,6 +75,36 @@ const generatePaginator = function ({ selector, totalpages, orderDirection, orde
     }
 };
 
+const baseAppTemplate = function (pageNumber, totalpages, perPage) {
+    return `
+        <h1 style="text-align:center">Reporte de productos vendidos</h1>
+        <div class="centering-cell">
+            <div>
+                <div>Pagina: ${pageNumber}/${totalpages}</div>
+                <div>Productos por pagina: ${perPage}</div>
+            </div>
+            <form method="get" action="" class="centering-cell report-search">
+            <div><input type="text" name="search" placeholder="Buscar"></div>
+            <div><input type="submit" name="" value="Buscar"></div>
+            </form>
+            <div><a href="itemsold.html"><button type="button">Borrar</button></a></div>
+            <div><button type="button" class="downloadReport">Descargar reporte</button></div>
+        </div>
+        
+        <table>
+            <tr>
+                <th data-order="barcode">Barcode ▲</th>
+                <th data-order="product">Descripción ▲</th>
+                <th data-order="stock_price">Valor ▲</th>
+                <th data-order="price">Precio ▲</th>
+                <th data-order="stock">Stock ▲</th>
+                <th>Opciones</th>
+            </tr>
+        </table>
+        <div class="paginator"></div>
+    `;
+};
+
 document.addEventListener("DOMContentLoaded", async function(){
     const ItemSoldData = await getItemSoldData({
         pageNumber: pageNumber,
@@ -153,6 +120,16 @@ document.addEventListener("DOMContentLoaded", async function(){
     for (code in ItemSoldData.list){
         for(let i = 0; i<ItemSoldData.list[code].length; i++){
             const newRow = document.createElement('tr');
+
+            let extraCols = '';
+            for (quarter in ItemSoldData.list[code][i].lotsbyquarter ){
+                extraCols += `
+                    <td>
+                        ${ItemSoldData.list[code][i].lotsbyquarter[quarter]}
+                    </td>
+                `;
+            }
+
             newRow.innerHTML = `
                 <tr>
                     <td><div class="centering-cell">${code}</div></td>
@@ -173,8 +150,9 @@ document.addEventListener("DOMContentLoaded", async function(){
                         ${ItemSoldData.list[code][i].stock}
                     </td>
                     <td class="centering-cell">
-                        <a href="itemsoldbyclient.html?search=${ItemSoldData.list[code][i].barcode}">Ver salidas por cliente</a
+                        <a href="itemsoldbyclient.html?search=${ItemSoldData.list[code][i].barcode}">Ver ventas</a
                     </td>
+                    ${extraCols}
                 </tr>
             `;
 
