@@ -1,6 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
 const pageNumber = urlParams.get('page') ?? 1;
-const perPage = urlParams.get('perpage') ?? 20;
+const perPage = urlParams.get('perpage') ?? 10;
 let orderDirection = urlParams.get('direction') ?? 'desc';
 let orderby = urlParams.get('orderby') ?? 'stock_price';
 let search = urlParams.get('search') ?? null;
@@ -9,14 +9,10 @@ const directions = {
     false: "desc",
 };
 
-const getItemSoldData = async function ({ pageNumber, perPage, direction, orderby, csvFormat }) {
+const getItemSoldData = async function ({ csvFormat }) {
     csvFormat = csvFormat ?? false;
 
-    let endpoint = `http://api.localhost/v2/report/itemsold?direction=${direction}&orderby=${orderby}&perpage=${perPage}&page=${pageNumber}`;
-
-    if (search) {
-        endpoint += `&search=${search}`;
-    }
+    let endpoint = `http://api.localhost/v2/report/itemsoldbyclient?&search=${search}`;
 
     if(csvFormat){
         endpoint += '&csv'
@@ -40,32 +36,28 @@ const getItemSoldData = async function ({ pageNumber, perPage, direction, orderb
     };
 };
 
-const baseAppTemplate = function (pageNumber, totalpages, perPage){
+const baseAppTemplate = function (){
     return `
         <h1 style="text-align:center">Reporte de productos vendidos por cliente</h1>
         <div class="d-flex-col">
-            <div>
-                <div>Pagina: ${pageNumber}/${totalpages}</div>
-                <div>Productos por pagina: ${perPage}</div>
-            </div>
             <div><button type="button" class="downloadReport">Descargar reporte</button></div>
             <form method="get" action="" class="d-flex-col report-search">
                 <div><input type="text" name="search" placeholder="Buscar"></div>
                 <div><input type="submit" name="" value="Buscar"></div>
+                <div><a href="itemsold.html">Vista principal</a></div>
             </form>
         </div>
         
         <table>
             <tr>
-                <th data-order="barcode">Barcode ▲</th>
-                <th data-order="product">Descripción ▲</th>
-                <th data-order="stock_price">Valor ▲</th>
-                <th data-order="price">Precio ▲</th>
-                <th data-order="stock">Stock ▲</th>
-                <th>Opciones</th>
+                <th>Barcode</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Client</th>
+                <th>Order</th>
             </tr>
         </table>
-        <div class="paginator"></div>
 
         <style>
         #itemsold-app table{
@@ -83,17 +75,6 @@ const baseAppTemplate = function (pageNumber, totalpages, perPage){
             align-items: center;
             justify-content: center
         }
-        #itemsold-app .paginator{
-            padding: 1rem;
-            text-align:center;
-        }
-        #itemsold-app .paginator a {
-            display: inline-block;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin: 0.2rem;
-        }
         .d-flex-col{
             display: flex;
             gap: 1rem;
@@ -105,10 +86,6 @@ const baseAppTemplate = function (pageNumber, totalpages, perPage){
 
 const reportDownloadAction = async function (e) {
     const ItemSoldData = await getItemSoldData({
-        pageNumber: pageNumber,
-        perPage: perPage,
-        direction: orderDirection,
-        orderby: orderby,
         csvFormat: true
     });
 
@@ -116,34 +93,13 @@ const reportDownloadAction = async function (e) {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.setAttribute('href', url);
-    a.setAttribute('download', `report-${pageNumber}-${perPage}-${orderDirection}-${orderby}.csv`);
+    a.setAttribute('download', `report-${search}.csv`);
     a.click();
-};
-
-const reportOrderAction = item => {
-    item.addEventListener('click', function () {
-        orderDirection = orderDirection == 'asc' ? 'desc' : 'asc';
-        orderby = item.getAttribute("data-order");
-        window.location.href = `itemsold.html?direction=${orderDirection}&orderby=${orderby}&perpage=${perPage}&page=1`
-    });
-};
-
-const generatePaginator = function ({ selector, totalpages, orderDirection, orderby, perPage }){
-    const paginator = document.querySelector(selector);
-    for (let i = 1; i <= totalpages; i++) {
-        const link = document.createElement('a');
-        link.href = `itemsold.html?direction=${orderDirection}&orderby=${orderby}&perpage=${perPage}&page=${i}`;
-        link.innerHTML = i;
-        paginator.appendChild(link);
-    }
 };
 
 document.addEventListener("DOMContentLoaded", async function(){
     const ItemSoldData = await getItemSoldData({
-        pageNumber: pageNumber,
-        perPage:perPage,
-        direction: orderDirection,
-        orderby: orderby
+        search: search,
     });
     const appBase = document.querySelector("#itemsold-app");
     appBase.innerHTML = baseAppTemplate(pageNumber, ItemSoldData.totalpages, perPage);
@@ -162,18 +118,38 @@ document.addEventListener("DOMContentLoaded", async function(){
                         </div>
                     </td>
                     <td>
+                        ${ItemSoldData.list[code][i].pieces}
+                    </td>
+                    <td>
                         <div>
-                            $${ItemSoldData.list[code][i].stock_price}
+                            <p>Precio de venta: $${ItemSoldData.list[code][i].unit_price} ${ItemSoldData.list[code][i].percent_discount}</p>
+                            <p>Precio actual: $${ItemSoldData.list[code][i].sell_price}</p>
                         </div>
                     </td>
                     <td>
-                        ${ItemSoldData.list[code][i].sell_price}
+                        <div>
+                            <strong>Id</strong>: ${ItemSoldData.list[code][i].client_id}
+                        </div>
+                        <div>
+                            <strong>Nombre</strong>: ${ItemSoldData.list[code][i].client_name}
+                        </div>
+                        <div>
+                            <strong>Mail</strong>: ${ItemSoldData.list[code][i].client_email}
+                        </div>
+                        <div>
+                            <strong>Telefono</strong>: ${ItemSoldData.list[code][i].client_phone}
+                        </div>
                     </td>
                     <td>
-                        ${ItemSoldData.list[code][i].stock}
-                    </td>
-                    <td class="centering-cell">
-                        <a href="itemsoldbyclient.html?search=${ItemSoldData.list[code][i].barcode}">Ver salidas por cliente</a
+                        <div>
+                            <strong>Order Id</strong>: ${ItemSoldData.list[code][i].order_id}
+                        </div>
+                        <div>
+                            <strong>Fecha de la orden</strong>: ${ItemSoldData.list[code][i].created_date}
+                        </div>
+                        <div>
+                            <strong>Fecha de pago</strong>: ${ItemSoldData.list[code][i].payment_method}
+                        </div>
                     </td>
                 </tr>
             `;
@@ -183,22 +159,12 @@ document.addEventListener("DOMContentLoaded", async function(){
 
     }
 
-    generatePaginator({
-        selector: ".paginator",
-        totalpages: ItemSoldData.totalpages,
-        orderDirection: orderDirection, 
-        orderby: orderby, 
-        perPage: perPage
-    });
-
-    [...document.querySelectorAll("[data-order")].forEach(reportOrderAction);
-
     const reportDownloadButton = document.querySelector(".downloadReport");
     reportDownloadButton.addEventListener('click', reportDownloadAction);
 
     document.querySelector('.report-search').addEventListener('submit', function(e){
         e.preventDefault();
-        window.location.href = `itemsold.html?direction=${orderDirection}&orderby=${orderby}&perpage=${perPage}&page=1&search=${this.search.value}`;
+        window.location.href = `itemsoldbyclient.html?search=${this.search.value}`;
     });
 
 });
