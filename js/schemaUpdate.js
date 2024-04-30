@@ -163,6 +163,8 @@ document.addEventListener('DOMContentLoaded', async function(){
     const optionNodeMap = presentOptionNodeList(await getNodeOptionList());
     const optionListSelector = prepareOptionList(optionNodeMap);
     const activeNodeSelector = optionListSelector.cloneNode(true);
+    console.log(optionListSelector);
+    console.log(activeNodeSelector);
     schemaNodeTypeSelector.appendChild(activeNodeSelector);
     optionListContainer.appendChild(optionListSelector);
 
