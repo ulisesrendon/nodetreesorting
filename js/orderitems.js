@@ -3,6 +3,7 @@ const pageNumber = urlParams.get('page') ?? 1;
 const perPage = urlParams.get('perpage') ?? 10;
 let orderDirection = urlParams.get('direction') ?? 'desc';
 let orderby = urlParams.get('orderby') ?? 'stock_price';
+let search = urlParams.get('search') ?? null;
 const directions = {
     true: "asc",
     false: "desc",
@@ -13,10 +14,14 @@ const getItemSoldData = async function ({ pageNumber, perPage, direction, orderb
 
     let endpoint = `http://api.localhost/v2/report/itemsold?direction=${direction}&orderby=${orderby}&perpage=${perPage}&page=${pageNumber}`;
 
+    if (search) {
+        endpoint += `&search=${search}`;
+    }
+
     if(csvFormat){
         endpoint += '&csv'
     }
-
+ 
     const response = await fetch(endpoint, {
         method: "GET",
         headers: {
@@ -37,12 +42,19 @@ const getItemSoldData = async function ({ pageNumber, perPage, direction, orderb
 
 const baseAppTemplate = function (pageNumber, totalpages, perPage){
     return `
-        <h1 style="text-align:center">Reporte de productos vendidos</h1>
-        <div>
-            <div>Pagina: ${pageNumber}/${totalpages}</div>
-            <div>Productos por pagina: ${perPage}</div>
-            <div><button type="button" class="downloadReport">Descargar</button></div>
+        <h1 style="text-align:center">Reporte de productos vendidos por cliente</h1>
+        <div class="d-flex-col">
+            <div>
+                <div>Pagina: ${pageNumber}/${totalpages}</div>
+                <div>Productos por pagina: ${perPage}</div>
+            </div>
+            <div><button type="button" class="downloadReport">Descargar reporte</button></div>
+            <form method="get" action="" class="d-flex-col report-search">
+                <div><input type="text" name="search" placeholder="Buscar"></div>
+                <div><input type="submit" name="" value="Buscar"></div>
+            </form>
         </div>
+        
         <table>
             <tr>
                 <th data-order="barcode">Barcode ▲</th>
@@ -82,6 +94,11 @@ const baseAppTemplate = function (pageNumber, totalpages, perPage){
             border: 1px solid #ccc;
             border-radius: 5px;
             margin: 0.2rem;
+        }
+        .d-flex-col{
+            display: flex;
+            gap: 1rem;
+            align-items: center;
         }
         </style>
     `;
@@ -192,7 +209,6 @@ document.addEventListener("DOMContentLoaded", async function(){
 
     }
 
-
     generatePaginator({
         selector: ".paginator",
         totalpages: ItemSoldData.totalpages,
@@ -205,5 +221,10 @@ document.addEventListener("DOMContentLoaded", async function(){
 
     const reportDownloadButton = document.querySelector(".downloadReport");
     reportDownloadButton.addEventListener('click', reportDownloadAction);
+
+    document.querySelector('.report-search').addEventListener('submit', function(e){
+        e.preventDefault();
+        window.location.href = `itemsold.html?direction=${orderDirection}&orderby=${orderby}&perpage=${perPage}&page=1&search=${this.search.value}`;
+    });
 
 });
