@@ -1,7 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const pageNumber = urlParams.get('page') ?? 1;
-const perPage = urlParams.get('perpage') ?? 20;
-let orderDirection = urlParams.get('direction') ?? 'asc';
+const perPage = urlParams.get('perpage') ?? 10;
+let orderDirection = urlParams.get('direction') ?? 'desc';
 let orderby = urlParams.get('orderby') ?? 'stock_price';
 const directions = {
     true: "asc",
@@ -46,8 +46,8 @@ const baseAppTemplate = function (pageNumber, totalpages, perPage){
         <table>
             <tr>
                 <th data-order="barcode">Barcode ▲</th>
-                <th data-order="product">Product ▲</th>
-                <th data-order="stock_price">Costo del inventario ▲</th>
+                <th data-order="product">Descripción ▲</th>
+                <th data-order="stock_price">Valor ▲</th>
                 <th data-order="stock">Stock ▲</th>
                 <th>Precio</th>
                 <th>Client</th>
@@ -140,9 +140,9 @@ document.addEventListener("DOMContentLoaded", async function(){
             newRow.innerHTML = `
                 <tr>
                     <td><div class="centering-cell">${code}</div></td>
-                    <td>
+                    <td style="max-width: 500px">
                         <div class="centering-cell">
-                            ${ItemSoldData.list[code][i].name} ${ItemSoldData.list[code][i].molecule} ${ItemSoldData.list[code][i].dose} ${ItemSoldData.list[code][i].pharmaceutical_form}
+                            ${ItemSoldData.list[code][i].description}
                         </div>
                     </td>
                     <td>
@@ -201,8 +201,7 @@ document.addEventListener("DOMContentLoaded", async function(){
         perPage: perPage
     });
 
-    const orderButtons = [...document.querySelectorAll("[data-order")];
-    orderButtons.forEach(reportOrderAction);
+    [...document.querySelectorAll("[data-order")].forEach(reportOrderAction);
 
     const reportDownloadButton = document.querySelector(".downloadReport");
     reportDownloadButton.addEventListener('click', reportDownloadAction);
