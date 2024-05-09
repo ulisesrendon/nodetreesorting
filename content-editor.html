@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Editor</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body class="dark">
+    <div class="container">
+        <h2>Content Editor</h2>
+        <div class="container"><a href="index.html">Index</a></div>
+        <form class="container shcemaCreateForm" id="content-editor">
+            <div class="form-field">
+                <label for="title">Title</label>
+                <input class="form-field-block" type="text" placeholder="title" name="title" id="title">
+            </div>
+            <div class="form-field">
+                <label for="name">Name</label>
+                <input class="form-field-block" type="text" placeholder="name" name="name" id="name">
+            </div>
+            <div class="form-field">
+                <label for="path">Path</label>
+                <input class="form-field-block" type="text" placeholder="path" name="path" id="path">
+            </div>
+            <div class="form-field">
+                <label for="content_type">Content type</label>
+                <select class="form-field-block" name="content_type" id="content_type" x-data="contentTypeData()">
+                    <option value="">Select a type</option>
+                    <template x-for="contenttype in ContentTypes" :key="contenttype.id">
+                        <option x-text="contenttype.title" x-bind:value="contenttype.id"></option>
+                    </template>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Content body</label>
+                <div id="body_editor" class="aceeditor aceeditor-big">{}</div>
+            </div>
+            <div class="form-field">
+                <label for="description">Description</label>
+                <textarea class="form-field-block" placeholder="description" name="description" id="description" rows="10"></textarea>
+            </div>
+            <div class="form-field">
+                <label for="config">Extra configuration</label>
+                <div id="config_editor" class="aceeditor">{}</div>
+                <!-- <textarea class="form-field-block" placeholder="config" name="config" id="config" rows="10">{}</textarea> -->
+            </div>
+            <button type="submit" id="schemaCreate">Save</button>
+        </form>
+    </div>
+    <script src="js/session.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" crossorigin="anonymous"></script>
+    <!--suppress JSUnresolvedLibraryURL -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.9.6/ace.js" crossorigin="anonymous"></script>
+    <!--suppress JSUnresolvedLibraryURL -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify.min.js" crossorigin="anonymous"></script>
+    <script src="js/content.js"></script>
+</body>
+
+</html>
