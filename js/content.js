@@ -100,16 +100,16 @@ document.addEventListener('DOMContentLoaded', async function()
     const body_editor = ace.edit("body_editor", {
         mode: "ace/mode/javascript",
         minLines: 10,
-        // maxLines: 10000,
         tabSize: 4,
-        showPrintMargin: false
+        showPrintMargin: false,
+        wrap: 80
     });
     const config_editor = ace.edit("config_editor", {
         mode: "ace/mode/javascript",
         minLines: 10,
-        // maxLines: 10000,
         tabSize: 4,
-        showPrintMargin: false
+        showPrintMargin: false,
+        wrap: 80
     });
 
     if (!content){
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async function()
         const contentValues = {
             body: JSON.parse(body_editor.getValue()),
             config: JSON.parse(config_editor.getValue()),
-            Content_type_id: contentEditor.content_type.value,
+            content_type_id: contentEditor.content_type.value,
             title: contentEditor.title.value,
             name: contentEditor.name.value,
             path: contentEditor.path.value,
